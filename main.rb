@@ -15,8 +15,11 @@ class Grammar
   end
 
   def classify
-    info = {class: 0, name: 'unrestricted grammar'}
-
+    info = Array.new
+    info.push({class: 0, name: 'unrestricted grammar'})
+    info.push({class: 1, name: 'noncontracting grammar'}) if noncontracting?
+    info.push({class: 1, name: 'context-sensitive grammar'}) if context_sensitive?
+    info
   end
 
   def valid?
@@ -30,7 +33,7 @@ class Grammar
   end
 
   def context_sensitive?
-
+    @rules.all? { |left, right| !N.match(left).nil? }
   end
 
   private
@@ -54,7 +57,8 @@ begin
   lines = IO.readlines(ARGV[0])
 
   grammar = Grammar.new(lines)
-  puts(grammar.unrestricted?)
+  puts(grammar.rules)
+  puts(grammar.classify)
 rescue => e
   puts e
   exit
