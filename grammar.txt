@@ -1,1 +1,4 @@
-A->aA| bB
+A->Aa| Bb
+B->Bv|Cf
+B->cB
+aa->c

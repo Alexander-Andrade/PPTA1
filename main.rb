@@ -2,8 +2,8 @@ class Grammar
   N = /[A-Z]/
   T = /[a-zλ]/
   RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
-  LEFT_REGULAR_RULE = /^[A-Z]->([A-Z][a-zλ]|[a-zλ])(\|([A-Z][a-zλ]|[a-zλ]))*$/
-  RIGHT_REGULAR_RULE = /^[A-Z]->([a-zλ][A-Z]|[a-zλ])(\|([a-zλ][A-Z]|[a-zλ]))*$/
+  LEFT_REGULAR_RULE = /^#{N}->(#{N}#{T}|#{T})(\|(#{N}#{T}|#{T}))*$/
+  RIGHT_REGULAR_RULE = /^#{N}->(#{T}#{N}|#{T})(\|(#{T}#{N}|#{T}))*$/
 
   attr_accessor :rules
 
@@ -47,7 +47,7 @@ class Grammar
   end
 
   def left_regular?
-    @lines.all? { |line| puts(line); puts(line.length);!LEFT_REGULAR_RULE.match(line).nil? }
+    @lines.all? { |line| !LEFT_REGULAR_RULE.match(line).nil? }
   end
 
   def right_regular?
