@@ -19,6 +19,7 @@ class Grammar
     info.push({class: 0, name: 'unrestricted grammar'})
     info.push({class: 1, name: 'noncontracting grammar'}) if noncontracting?
     info.push({class: 1, name: 'context-sensitive grammar'}) if context_sensitive?
+    info.push({class: 2, name: 'context-free grammar'}) if context_free?
     info
   end
 
@@ -35,7 +36,11 @@ class Grammar
   end
 
   def context_sensitive?
-    @rules.all? { |left_chain, right_rules| !N.match(left_chain).nil? }
+    @rules.all? { |left_chain, _| !N.match(left_chain).nil? }
+  end
+
+  def context_free?
+    @rules.all? { |left_chain, _| !/^#{N}$/.match(left_chain).nil? }
   end
 
   private
