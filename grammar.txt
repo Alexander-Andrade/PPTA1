@@ -1,4 +1,4 @@
 aA->aA| Bb | cDC
-BB -> s| SSs| cC
+BB -> sS| SSs| cC
 aa -> uUU
 aA -> kKK

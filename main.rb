@@ -29,11 +29,13 @@ class Grammar
   alias unrestricted? valid?
 
   def noncontracting?
-    @rules.all? { |left, right| left.length <= right.length }
+    @rules.all? do |left_chain, right_rules|
+      left_chain.length <= right_rules.min_by(&:length).length
+    end
   end
 
   def context_sensitive?
-    @rules.all? { |left, right| !N.match(left).nil? }
+    @rules.all? { |left_chain, right_rules| !N.match(left_chain).nil? }
   end
 
   private
