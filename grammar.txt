@@ -1,2 +1,2 @@
 aA->aA| Bb | cDC
-B  -> s| SSs| cC
+BB -> s| SSs| cC

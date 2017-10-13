@@ -4,7 +4,7 @@ class Grammar
 
   def initialize(lines)
     @lines = lines
-    @rules = Hash.new([])
+    @rules = Hash.new { |hash, key|  hash[key] = Array.new }
     trim
     raise StandardError, "Given grammar contains errors" unless valid?
     parse
@@ -25,7 +25,8 @@ class Grammar
       match_data = RULE.match(line)
       left = match_data[:left]
       right = match_data[:right].split('|')
-      @rules[left] << right
+      @rules[left].push(*right)
+      puts("left #{left}, right #{right} rule #{@rules[left]}")
     end
   end
 
