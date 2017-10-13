@@ -1,8 +1,9 @@
 class Grammar
-
-  RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
   N = /[A-Z]/
   T = /[a-zλ]/
+  RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
+  LEFT_REGULAR_RULE = /^[A-Z]->([A-Z][a-zλ]|[a-zλ])(\|([A-Z][a-zλ]|[a-zλ]))*$/
+  RIGHT_REGULAR_RULE = /^[A-Z]->([a-zλ][A-Z]|[a-zλ])(\|([a-zλ][A-Z]|[a-zλ]))*$/
 
   attr_accessor :rules
 
@@ -20,6 +21,8 @@ class Grammar
     info.push({class: 1, name: 'noncontracting grammar'}) if noncontracting?
     info.push({class: 1, name: 'context-sensitive grammar'}) if context_sensitive?
     info.push({class: 2, name: 'context-free grammar'}) if context_free?
+    info.push({class: 3, name: 'left-regular grammar'}) if left_regular?
+    info.push({class: 3, name: 'right-regular grammar'}) if right_regular?
     info
   end
 
@@ -41,6 +44,14 @@ class Grammar
 
   def context_free?
     @rules.all? { |left_chain, _| !/^#{N}$/.match(left_chain).nil? }
+  end
+
+  def left_regular?
+    @lines.all? { |line| puts(line); puts(line.length);!LEFT_REGULAR_RULE.match(line).nil? }
+  end
+
+  def right_regular?
+    @lines.all? { |line| !RIGHT_REGULAR_RULE.match(line).nil? }
   end
 
   private
