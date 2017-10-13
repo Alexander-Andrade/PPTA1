@@ -1,6 +1,8 @@
 class Grammar
 
   RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
+  N = /[A-Z]/
+  T = /[a-zλ]/
 
   attr_accessor :rules
 
@@ -12,9 +14,22 @@ class Grammar
     parse
   end
 
-
   def classify
     info = {class: 0, name: 'unrestricted grammar'}
+
+  end
+
+  def valid?
+    @lines.all? { |line| !RULE.match(line).nil? }
+  end
+
+  alias unrestricted? valid?
+
+  def noncontracting?
+    @rules.all? { |left, right| left.length <= right.length }
+  end
+
+  def context_sensitive?
 
   end
 
@@ -22,10 +37,6 @@ class Grammar
 
   def trim
     @lines.each { |line| line.gsub!(/\s+/,'') }
-  end
-
-  def valid?
-    @lines.all? { |line| !RULE.match(line).nil? }
   end
 
   def parse
@@ -37,23 +48,13 @@ class Grammar
     end
   end
 
-  alias :valid? :unrestricted?
-  
-  def noncontracting?
-    @rules.all? { |left, right| left.length <= right.length }
-  end
-
-  def klass_2?
-
-  end
-
 end
 
 begin
   lines = IO.readlines(ARGV[0])
 
   grammar = Grammar.new(lines)
-  puts(grammar.rules)
+  puts(grammar.unrestricted?)
 rescue => e
   puts e
   exit
