@@ -1,10 +1,3 @@
-begin
-  lines = IO.readlines(ARGV[0])
-rescue => e
-  puts e
-  exit
-end
-
 class Grammar
 
   RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
@@ -24,7 +17,7 @@ class Grammar
   end
 
   def valid?
-    @lines.all { |line| !RULE.match(line).nil? }
+    @lines.all? { |line| !RULE.match(line).nil? }
   end
 
   def parse
@@ -38,4 +31,11 @@ class Grammar
 
 end
 
-grammar = Grammar.new(lines)
+begin
+  lines = IO.readlines(ARGV[0])
+
+  grammar = Grammar.new(lines)
+rescue => e
+  puts e
+  exit
+end
