@@ -11,10 +11,11 @@ class Grammar
 
   def initialize(lines)
     @lines = lines
+    @rules = Hash.new([])
     trim
     raise StandardError, "Given grammar contains errors" unless valid?
+    parse
   end
-
 
   private
 
@@ -27,19 +28,14 @@ class Grammar
   end
 
   def parse
-
+    @lines.each do |line|
+      match_data = RULE.match(line)
+      left = match_data[:left]
+      right = match_data[:right].split('|')
+      @rules[left] << right
+    end
   end
 
 end
 
-
-
-#test.gsub!(/\s+/,'')
-# test = "aA->bB|aB|cCD|cA|aA"
-#
-# match_data = RULE.match(test)
-# puts(match_data.nil?)
-# puts(match_data[:left])
-# puts(match_data[:right])
-#
-# rules = Hash.new
+grammar = Grammar.new(lines)
