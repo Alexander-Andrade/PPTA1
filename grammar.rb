@@ -16,6 +16,7 @@ class Grammar
     @S = params[:S]
 
     trim
+    raise StandardError, "Grammar contains errors" unless valid?
 
     @grammar_classifier = GrammarClassifier.new(@P)
   end

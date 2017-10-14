@@ -12,9 +12,6 @@ begin
                             P: raw_rules,
                             S: "X"
                         })
-
-  puts(grammar.valid?)
-  puts(grammar.regular?)
 rescue => e
   puts e
   exit
