@@ -15,7 +15,8 @@ begin
                         })
 
   fsm = FSM.new(grammar)
-  puts(fsm.complete_grammar_with_new_N)
+  fsm.complete_grammar_with_new_N
+  p fsm.rules
 rescue => e
   puts e
   exit

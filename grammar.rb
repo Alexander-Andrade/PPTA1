@@ -26,12 +26,6 @@ class Grammar
     @P.all? { |line| !RULE.match(line).nil? }
   end
 
-  private
-
-  def trim_spaces_in_rules
-    @P.each { |line| line.gsub!(/\s+/,'') }
-  end
-
   def parse_rules
     rules = Hash.new { |hash, key|  hash[key] = Array.new }
     @P.each do |line|
@@ -41,6 +35,12 @@ class Grammar
       rules[left].push(*right)
     end
     rules
+  end
+
+  private
+
+  def trim_spaces_in_rules
+    @P.each { |line| line.gsub!(/\s+/,'') }
   end
 
 end
