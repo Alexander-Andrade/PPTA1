@@ -1,10 +1,9 @@
-require 'grammar'
+require_relative 'grammar_classifier'
 
 begin
-  lines = IO.readlines(ARGV[0])
+  rules = IO.readlines(ARGV[0])
 
-  grammar = Grammar.new(lines)
-  puts(grammar.rules)
+  grammar = GrammarClassifier.new(rules)
   puts(grammar.classify)
 rescue => e
   puts e

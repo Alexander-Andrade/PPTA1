@@ -1,14 +1,12 @@
-class Grammar
+class GrammarClassifier
   N = /[A-Z]/
   T = /[a-zλ]/
   RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
   LEFT_REGULAR_RULE = /^#{N}->(#{N}#{T}|#{T})(\|(#{N}#{T}|#{T}))*$/
   RIGHT_REGULAR_RULE = /^#{N}->(#{T}#{N}|#{T})(\|(#{T}#{N}|#{T}))*$/
 
-  attr_accessor :rules
-
-  def initialize(lines)
-    @lines = lines
+  def initialize(raw_rules)
+    @raw_rules = raw_rules
     @rules = Hash.new { |hash, key|  hash[key] = Array.new }
     trim
     raise StandardError, "Given grammar contains errors" unless valid?
@@ -27,7 +25,7 @@ class Grammar
   end
 
   def valid?
-    @lines.all? { |line| !RULE.match(line).nil? }
+    @raw_rules.all? { |line| !RULE.match(line).nil? }
   end
 
   alias unrestricted? valid?
@@ -47,21 +45,25 @@ class Grammar
   end
 
   def left_regular?
-    @lines.all? { |line| !LEFT_REGULAR_RULE.match(line).nil? }
+    @raw_rules.all? { |line| !LEFT_REGULAR_RULE.match(line).nil? }
   end
 
   def right_regular?
-    @lines.all? { |line| !RIGHT_REGULAR_RULE.match(line).nil? }
+    @raw_rules.all? { |line| !RIGHT_REGULAR_RULE.match(line).nil? }
+  end
+
+  def regular?
+    left_regular? || right_regular?
   end
 
   private
 
   def trim
-    @lines.each { |line| line.gsub!(/\s+/,'') }
+    @raw_rules.each { |line| line.gsub!(/\s+/,'') }
   end
 
   def parse
-    @lines.each do |line|
+    @raw_rules.each do |line|
       match_data = RULE.match(line)
       left = match_data[:left]
       right = match_data[:right].split('|')
