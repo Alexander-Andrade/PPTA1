@@ -1,7 +1,7 @@
 class FSM
 
-  def initialize()
-
+  def initialize(grammar)
+    @grammar = grammar
   end
 
 end

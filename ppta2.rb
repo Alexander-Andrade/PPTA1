@@ -1,12 +1,17 @@
-require_relative 'grammar_classifier'
+require_relative 'grammar'
+
+# G=(T, N, P, S)
+# G=({X, Y, Z, W, V}, {0, 1, ~, #, &}, P, X)
 
 begin
-  lines = IO.readlines(ARGV[0])
+  raw_rules = IO.readlines(ARGV[0])
 
-  grammar = GrammarClassifier.new(lines)
-  puts(grammar.rules)
-  puts(grammar.classify)
-  puts("regular: #{grammar.regular?}")
+  grammar = Grammar.new({
+                            T: %w(X Y Z W V),
+                            N: %w(0 1 ~ # &),
+
+                        })
+
 rescue => e
   puts e
   exit
