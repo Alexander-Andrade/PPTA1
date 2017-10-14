@@ -3,10 +3,9 @@ require_relative 'grammar_regexp'
 class GrammarClassifier
   include GrammarRegexp
 
-  def initialize(raw_rules)
-    @raw_rules = raw_rules
-    @rules = Hash.new { |hash, key|  hash[key] = Array.new }
-    parse
+  def initialize(grammar)
+    @raw_rules = grammar.P
+    @rules =grammar.rules
   end
 
   def classify
@@ -47,14 +46,5 @@ class GrammarClassifier
   end
 
   private
-
-  def parse
-    @raw_rules.each do |line|
-      match_data = RULE.match(line)
-      left = match_data[:left]
-      right = match_data[:right].split('|')
-      @rules[left].push(*right)
-    end
-  end
 
 end
