@@ -9,8 +9,11 @@ begin
   grammar = Grammar.new({
                             T: %w(X Y Z W V),
                             N: %w(0 1 ~ # &),
-
+                            P: raw_rules,
+                            S: "X"
                         })
+
+  puts(grammar.valid?)
 
 rescue => e
   puts e

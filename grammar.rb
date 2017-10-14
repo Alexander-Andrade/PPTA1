@@ -1,9 +1,11 @@
 require_relative 'grammar_classifier'
+require 'forwardable'
 
 class Grammar
+  extend Forwardable
 
-  attr_accessor :grammar_classifier
-  delegate :valid?, to: :grammar_classifier
+  attr_accessor :T, :N, :P, :S ,:grammar_classifier
+  def_delegators :@grammar_classifier, :valid?
 
   def initialize(params)
     @T = params[:T]

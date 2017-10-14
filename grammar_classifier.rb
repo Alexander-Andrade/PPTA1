@@ -9,8 +9,7 @@ class GrammarClassifier
     @raw_rules = raw_rules
     @rules = Hash.new { |hash, key|  hash[key] = Array.new }
     trim
-    raise StandardError, "Given grammar contains errors" unless valid?
-    parse
+    parse if valid?
   end
 
   def classify
