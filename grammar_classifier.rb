@@ -1,15 +1,12 @@
+require_relative 'grammar_regexp'
+
 class GrammarClassifier
-  N = /[A-Z]/
-  T = /[a-zλ]/
-  RULE = /^(?<left>[a-z]+)->(?<right>[a-zλ]+(\|[a-zλ]+)*)$/i
-  LEFT_REGULAR_RULE = /^#{N}->(#{N}#{T}|#{T})(\|(#{N}#{T}|#{T}))*$/
-  RIGHT_REGULAR_RULE = /^#{N}->(#{T}#{N}|#{T})(\|(#{T}#{N}|#{T}))*$/
+  include GrammarRegexp
 
   def initialize(raw_rules)
     @raw_rules = raw_rules
     @rules = Hash.new { |hash, key|  hash[key] = Array.new }
-    trim
-    parse if valid?
+    parse
   end
 
   def classify
@@ -22,12 +19,6 @@ class GrammarClassifier
     info.push({class: 3, name: 'right-regular grammar'}) if right_regular?
     info
   end
-
-  def valid?
-    @raw_rules.all? { |line| !RULE.match(line).nil? }
-  end
-
-  alias unrestricted? valid?
 
   def noncontracting?
     @rules.all? do |left_chain, right_rules|
@@ -56,10 +47,6 @@ class GrammarClassifier
   end
 
   private
-
-  def trim
-    @raw_rules.each { |line| line.gsub!(/\s+/,'') }
-  end
 
   def parse
     @raw_rules.each do |line|

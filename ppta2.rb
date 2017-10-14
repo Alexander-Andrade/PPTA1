@@ -14,7 +14,7 @@ begin
                         })
 
   puts(grammar.valid?)
-
+  puts(grammar.regular?)
 rescue => e
   puts e
   exit

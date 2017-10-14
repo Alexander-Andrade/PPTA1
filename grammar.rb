@@ -1,11 +1,13 @@
 require_relative 'grammar_classifier'
+require_relative 'grammar_regexp'
 require 'forwardable'
 
 class Grammar
   extend Forwardable
+  include GrammarRegexp
 
   attr_accessor :T, :N, :P, :S ,:grammar_classifier
-  def_delegators :@grammar_classifier, :valid?
+  def_delegators :@grammar_classifier, :regular?
 
   def initialize(params)
     @T = params[:T]
@@ -13,7 +15,19 @@ class Grammar
     @P = params[:P]
     @S = params[:S]
 
+    trim
+
     @grammar_classifier = GrammarClassifier.new(@P)
+  end
+
+  def valid?
+    @P.all? { |line| !RULE.match(line).nil? }
+  end
+
+  private
+
+  def trim
+    @P.each { |line| line.gsub!(/\s+/,'') }
   end
 
 end
