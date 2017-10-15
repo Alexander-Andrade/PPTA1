@@ -1,7 +1,7 @@
-require_relative 'grammar_regexp'
+require_relative 'grammar_mixin'
 
 class FSM
-  include GrammarRegexp
+  include GrammarMixin
   # Q - states set
   # T - input symbols set
   # F - transition func QxT
@@ -36,11 +36,24 @@ class FSM
   end
 
   def nfa_to_dfa
+    new_Q = Marshal.load(Marshal.dump(@Q))
+    new_F = Hash.new { |hash, key|  hash[key] = Hash.new }
+    new_Z = []
+    states_map = {}
 
+    states_map[@H] = generate_nonterm_in(new_Q)
+
+    @T.each do |term|
+      transition_set = []
+      @H.each do |state|
+        transition_set.push(*@F[state][term])
+      end
+      states_map[transition_set] = generate_nonterm_in(new_Q)
+    end
   end
 
   def new_N
-    @new_N ||= (('A'..'Z').to_a - @grammar.N)[0]
+    @new_N ||= generate_nonterm(@grammar.N)
   end
 
   def complete_grammar_with_new_N
@@ -66,7 +79,8 @@ class FSM
       right_rules.each do |right_rule|
         right_term = right_rule[0]
         right_nonterm = right_rule[1]
-        @F[left_nonterm][right_term] = right_nonterm
+        @F[left_nonterm][right_term] = [] if @F[left_nonterm][right_term].nil?
+        @F[left_nonterm][right_term] << right_nonterm
       end
     end
   end

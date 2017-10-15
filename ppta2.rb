@@ -15,10 +15,10 @@ begin
                         })
 
   fsm = FSM.new(grammar)
-  fsm.build_nondeterministic
+  fsm.nfa
   p fsm.F
   p fsm.Z
-  p fsm.deterministic?
+  fsm.nfa_to_dfa
 rescue => e
   puts e
   exit

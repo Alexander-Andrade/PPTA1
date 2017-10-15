@@ -1,10 +1,10 @@
 require_relative 'grammar_classifier'
-require_relative 'grammar_regexp'
+require_relative 'grammar_mixin'
 require 'forwardable'
 
 class Grammar
   extend Forwardable
-  include GrammarRegexp
+  include GrammarMixin
 
   attr_accessor :T, :N, :P, :S ,:grammar_classifier, :rules
   def_delegators :@grammar_classifier, :regular?, :right_regular?, :classify

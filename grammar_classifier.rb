@@ -1,7 +1,7 @@
-require_relative 'grammar_regexp'
+require_relative 'grammar_mixin'
 
 class GrammarClassifier
-  include GrammarRegexp
+  include GrammarMixin
 
   def initialize(grammar)
     @raw_rules = grammar.P
