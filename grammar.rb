@@ -7,7 +7,7 @@ class Grammar
   include GrammarRegexp
 
   attr_accessor :T, :N, :P, :S ,:grammar_classifier, :rules
-  def_delegators :@grammar_classifier, :regular?
+  def_delegators :@grammar_classifier, :regular?, :right_regular?, :classify
 
   def initialize(params)
     @T = params[:T]
