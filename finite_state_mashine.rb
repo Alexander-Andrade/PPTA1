@@ -21,12 +21,22 @@ class FSM
     @Z = []
   end
 
-  def build_nondeterministic
+  def nfa
     complete_grammar_with_new_N
     form_state_sets
     rules_to_transition_function
     form_final_states
     process_init_grammar_sym
+  end
+
+  def dfa
+    nfa
+    return if deterministic?
+    nfa_to_dfa
+  end
+
+  def nfa_to_dfa
+
   end
 
   def new_N
@@ -66,9 +76,22 @@ class FSM
   end
 
   def process_init_grammar_sym
-    if @grammar.rules[@grammar.S].include?('ε')
-      @Z.push(@grammar.S)
+    @Z.push(@grammar.S) if @grammar.rules[@grammar.S].include?('ε')
+  end
+
+  def has_void_chain_transitions?
+    @rules.keys.all? { |left_nonterm| !@rules[left_nonterm].include?('ε') }
+  end
+
+  def has_state_transitions_with_one_sym?
+    @rules.keys.any? do |left_nonterm|
+      right_terms = @rules[left_nonterm].map { |rule| rule[0] }
+      right_terms.uniq.length != right_terms.length
     end
+  end
+
+  def deterministic?
+    !has_void_chain_transitions? && !has_state_transitions_with_one_sym?
   end
 
   private

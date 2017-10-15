@@ -18,6 +18,7 @@ begin
   fsm.build_nondeterministic
   p fsm.F
   p fsm.Z
+  p fsm.deterministic?
 rescue => e
   puts e
   exit
