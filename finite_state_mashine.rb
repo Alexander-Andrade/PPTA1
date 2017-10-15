@@ -16,7 +16,7 @@ class FSM
     raise StandardError, 'Grammar is not right-regular' unless @grammar.right_regular?
     @Q = []
     @T = []
-    @F = Hash.new
+    @F = Hash.new { |hash, key|  hash[key] = Hash.new }
     @H = []
     @Z = []
   end
@@ -25,6 +25,8 @@ class FSM
     complete_grammar_with_new_N
     form_state_sets
     rules_to_transition_function
+    form_final_states
+    process_init_grammar_sym
   end
 
   def new_N
@@ -45,17 +47,27 @@ class FSM
 
   def form_state_sets
     @H.push(*@grammar.S)
-    @Q.push(*(@grammar.N + new_N))
+    @Q.push(*(@grammar.N + [new_N]))
     @T.push(*@grammar.T)
   end
 
   def rules_to_transition_function
     @rules.each do |left_nonterm, right_rules|
       right_rules.each do |right_rule|
-        term = right_rule[0]
+        right_term = right_rule[0]
         right_nonterm = right_rule[1]
-        @F[left_nonterm][term] = right_nonterm
+        @F[left_nonterm][right_term] = right_nonterm
       end
+    end
+  end
+
+  def form_final_states
+    @Z.push(new_N) unless @new_N.nil?
+  end
+
+  def process_init_grammar_sym
+    if @grammar.rules[@grammar.S].include?('ε')
+      @Z.push(@grammar.S)
     end
   end
 
