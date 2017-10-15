@@ -43,12 +43,19 @@ class FSM
 
     states_map[@H] = generate_nonterm_in(new_Q)
 
+    build_transition_functions_for_dfa(@H, new_F, new_Q, states_map)
+  end
+
+  def build_transition_functions_for_dfa(col_set, new_F, new_Q, states_map)
     @T.each do |term|
       transition_set = []
-      @H.each do |state|
+      col_set.each do |state|
         transition_set.push(*@F[state][term])
       end
-      states_map[transition_set] = generate_nonterm_in(new_Q)
+
+      new_F[state][term] = transition_set
+      states_map[transition_set] = generate_nonterm_in(new_Q) if transition_set.length > 1
+      build_transition_functions_for_dfa(transition_set, new_F, new_Q, states_map) if states_map[transition_set].nil?
     end
   end
 
