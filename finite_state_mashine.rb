@@ -24,7 +24,7 @@ class NFA < FSM
 
 
   def initialize(grammar)
-    super
+    super()
     @grammar = grammar
     @rules = @grammar.parse_rules
     raise StandardError, 'Grammar is not right-regular' unless @grammar.right_regular?
@@ -100,7 +100,7 @@ end
 class DFA < FSM
 
   def initialize(nfa)
-    super
+    super()
 
     @nfa = nfa
 
@@ -124,7 +124,7 @@ class DFA < FSM
     @T.each do |term|
       transition_set = []
       col_set.each do |state|
-        transition_set.push(*@F[state][term])
+        transition_set.push(*@nfa.F[state][term])
       end
 
       return if transition_set.empty?
