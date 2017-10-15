@@ -10,10 +10,7 @@ class FSM
 
   attr_accessor :rules, :Q, :T, :F, :H, :Z
 
-  def initialize(grammar)
-    @grammar = grammar
-    @rules = @grammar.parse_rules
-    raise StandardError, 'Grammar is not right-regular' unless @grammar.right_regular?
+  def initialize
     @Q = []
     @T = []
     @F = Hash.new { |hash, key|  hash[key] = Hash.new }
@@ -21,48 +18,22 @@ class FSM
     @Z = []
   end
 
-  def nfa
+end
+
+class NFA < FSM
+
+
+  def initialize(grammar)
+    super
+    @grammar = grammar
+    @rules = @grammar.parse_rules
+    raise StandardError, 'Grammar is not right-regular' unless @grammar.right_regular?
+
     complete_grammar_with_new_N
     form_state_sets
     rules_to_transition_function
     form_final_states
     process_init_grammar_sym
-  end
-
-  def dfa
-    nfa
-    return if deterministic?
-    nfa_to_dfa
-  end
-
-  def nfa_to_dfa
-    new_Q = Marshal.load(Marshal.dump(@Q))
-    new_F = Hash.new { |hash, key|  hash[key] = Hash.new }
-    new_Z = []
-    states_map = {}
-
-    states_map[@H] = generate_nonterm_in(new_Q) if @H.length > 1
-
-    build_transition_functions_for_dfa(@H, new_F, new_Q, states_map)
-  end
-
-  def build_transition_functions_for_dfa(col_set, new_F, new_Q, states_map)
-    @T.each do |term|
-      transition_set = []
-      col_set.each do |state|
-        transition_set.push(*@F[state][term])
-      end
-
-      return if transition_set.empty?
-
-      col_nonterm = col_set.length > 1 ? states_map[col_set] : col_set[0]
-
-      return unless new_F[col_nonterm][term].empty?
-
-      new_F[col_nonterm][term] = transition_set
-      states_map[transition_set] = generate_nonterm_in(new_Q)  if transition_set.length > 1
-      build_transition_functions_for_dfa(transition_set, new_F, new_Q, states_map)
-    end
   end
 
   def new_N
@@ -122,5 +93,51 @@ class FSM
   end
 
   private
+
+end
+
+
+class DFA < FSM
+
+  def initialize(nfa)
+    super
+
+    @nfa = nfa
+
+    return if @nfa.deterministic?
+
+    @Q = Marshal.load(Marshal.dump(@nfa.Q))
+    @T = Marshal.load(Marshal.dump(@nfa.T))
+    @H = Marshal.load(Marshal.dump(@nfa.H))
+    @states_map = {}
+
+    @states_map[@H] = generate_nonterm_in(@Q) if @H.length > 1
+
+    build_transition_functions(@H)
+  end
+
+  def form_dfa_Z
+
+  end
+
+  def build_transition_functions(col_set)
+    @T.each do |term|
+      transition_set = []
+      col_set.each do |state|
+        transition_set.push(*@F[state][term])
+      end
+
+      return if transition_set.empty?
+
+      transition_set.uniq!
+      col_nonterm = col_set.length > 1 ? @states_map[col_set] : col_set[0]
+
+      return unless @F[col_nonterm][term].nil?
+
+      @F[col_nonterm][term] = transition_set
+      @states_map[transition_set] = generate_nonterm_in(@Q)  if transition_set.length > 1
+      build_transition_functions(transition_set)
+    end
+  end
 
 end

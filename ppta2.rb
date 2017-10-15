@@ -14,11 +14,14 @@ begin
                             S: "X"
                         })
 
-  fsm = FSM.new(grammar)
-  fsm.nfa
-  p fsm.F
-  p fsm.Z
-  fsm.nfa_to_dfa
+  nfa = NFA.new(grammar)
+  p nfa.F
+  p nfa.Z
+
+  dfa = DFA.new(nfa)
+  p dfa.Q
+  p dfa.F
+  p dfa.Z
 rescue => e
   puts e
   exit
