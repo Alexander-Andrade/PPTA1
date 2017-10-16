@@ -49,6 +49,8 @@ class NFA < FSM
           right_rules.push("#{term_rule}#{new_N}")
         end
       end
+      # remove term rules
+      @rules[nonterm] -= term_rules
     end
   end
 
@@ -106,20 +108,29 @@ class DFA < FSM
 
     @nfa = nfa
 
-    return if @nfa.deterministic?
-
     @Q = Marshal.load(Marshal.dump(@nfa.Q))
     @T = Marshal.load(Marshal.dump(@nfa.T))
     @H = Marshal.load(Marshal.dump(@nfa.H))
     @states_map = {}
-
+    @iter = 0
     @states_map[@H] = generate_nonterm_in(@Q) if @H.length > 1
 
     build_transition_functions(@H)
+    form_final_states
   end
 
-  def form_dfa_Z
+  def form_final_states
+    new_fin_states = @states_map.select do |state_set, _|
+      (state_set - @nfa.Z).length != state_set.length
+    end.values
+    @Z.push(*new_fin_states)
+    @Z.push(*@nfa.Z)
+  end
 
+  def extend_states(transition_set)
+    if @states_map[transition_set].nil? && transition_set.length > 1
+      @states_map[transition_set] = generate_nonterm_in(@Q)
+    end
   end
 
   def build_transition_functions(col_set)
@@ -137,7 +148,13 @@ class DFA < FSM
       return unless @F[col_nonterm][term].nil?
 
       @F[col_nonterm][term] = transition_set
-      @states_map[transition_set] = generate_nonterm_in(@Q)  if transition_set.length > 1
+      extend_states(transition_set)
+
+
+      puts("ITER: #{@iter}")
+      puts(@F)
+      puts(@states_map)
+      @iter += 1
       build_transition_functions(transition_set)
     end
   end

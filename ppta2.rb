@@ -18,6 +18,7 @@ begin
   p nfa.F
   p nfa.Z
   puts;puts;
+
   dfa = DFA.new(nfa)
   p dfa.Q
   puts;
