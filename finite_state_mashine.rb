@@ -117,6 +117,7 @@ class DFA < FSM
 
     build_transition_functions(@H)
     form_final_states
+    replace_state_sets_with_nonterms
   end
 
   def form_final_states
@@ -125,6 +126,17 @@ class DFA < FSM
     end.values
     @Z.push(*new_fin_states)
     @Z.push(*@nfa.Z)
+  end
+
+  def replace_state_sets_with_nonterms
+    @F.keys.each do |col_nonterm|
+      @F[col_nonterm].keys.each do |term|
+        if @F[col_nonterm][term].length > 1
+          transition_set = @F[col_nonterm][term]
+          @F[col_nonterm][term] = @states_map[transition_set]
+        end
+      end
+    end
   end
 
   def extend_states(transition_set)
