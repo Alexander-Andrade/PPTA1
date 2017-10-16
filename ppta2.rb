@@ -17,9 +17,12 @@ begin
   nfa = NFA.new(grammar)
   p nfa.F
   p nfa.Z
-
+  puts;puts;
   dfa = DFA.new(nfa)
   p dfa.Q
+  puts;
+  p dfa.states_map
+  puts;
   p dfa.F
   p dfa.Z
 rescue => e

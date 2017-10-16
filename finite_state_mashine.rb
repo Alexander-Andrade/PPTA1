@@ -99,6 +99,8 @@ end
 
 class DFA < FSM
 
+  attr_accessor :states_map
+
   def initialize(nfa)
     super()
 
