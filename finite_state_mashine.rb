@@ -35,7 +35,6 @@ end
 
 class NFA < FSM
 
-
   def initialize(grammar)
     super()
     @grammar = grammar
@@ -128,9 +127,10 @@ class DFA < FSM
 
     @Q = Marshal.load(Marshal.dump(@nfa.Q))
     @T = Marshal.load(Marshal.dump(@nfa.T))
+    @T.push('ε')
     @H = Marshal.load(Marshal.dump(@nfa.H))
     @states_map = {}
-    @iter = 0
+    # @iter = 0
     extend_states(@H)
 
     build_transition_functions(@H)
@@ -158,7 +158,6 @@ class DFA < FSM
       col_set.each do |state|
         transition_set.push(*@nfa.F[state][term])
       end
-      # return if transition_set.empty?
 
       transition_set.uniq!
       col_nonterm = col_set.length > 1 ? @states_map[col_set] : col_set[0]
@@ -168,11 +167,10 @@ class DFA < FSM
       @F[col_nonterm][term] = transition_set
       extend_states(transition_set)
 
-
-      puts("ITER: #{@iter}")
-      puts(@F)
-      puts(@states_map)
-      @iter += 1
+      # puts("ITER: #{@iter}")
+      # puts(@F)
+      # puts(@states_map)
+      # @iter += 1
       build_transition_functions(transition_set) unless transition_set.empty?
     end
   end
