@@ -1,4 +1,0 @@
-A->aA| bB
-B->vB|fC
-B->cB
-V->cC
