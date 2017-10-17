@@ -24,16 +24,11 @@ class FSM
   end
 
   def console
-    puts "Q:"
-    puts @Q
-    puts "T:"
-    puts @T
-    puts "F: "
-    puts @F
-    puts "H:"
-    puts @H
-    puts "Z:"
-    p @Z
+    puts "Q: #{@Q}"
+    puts "T: #{@T}"
+    puts "F: #{@F}"
+    puts "H: #{@H}"
+    puts "Z: #{@Z}"
   end
 
 end
@@ -196,10 +191,9 @@ class DFA < FSM
   end
 
   def console
-    puts "NFA"
+    puts "DFA"
     super
-    puts "states map:"
-    p @states_map
+    puts "states map: #{@states_map}"
   end
 
 end
