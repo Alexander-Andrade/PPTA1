@@ -17,7 +17,9 @@ class GraphDrawer
 
     @fsm.F.keys.each do |col_nonterm|
       @fsm.F[col_nonterm].keys.each do |term|
-        @graph.add_edges(col_nonterm,  @fsm.F[col_nonterm][term], "label" => term)
+        unless @fsm.F[col_nonterm][term].empty?
+          @graph.add_edges(col_nonterm,  @fsm.F[col_nonterm][term], "label" => term)
+        end
       end
     end
 

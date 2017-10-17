@@ -16,7 +16,7 @@ class FSM
   def initialize
     @Q = []
     @T = []
-    @F = Hash.new { |hash, key|  hash[key] = Hash.new }
+    @F = Hash.new { |hash, key| hash[key] = Hash.new }
     @H = []
     @Z = []
 
@@ -49,9 +49,16 @@ class NFA < FSM
     process_init_grammar_sym
   end
 
-  def new_N
-    @new_N ||= generate_nonterm(@grammar.N)
+  def deterministic?
+    !has_void_chain_transitions? && !has_state_transitions_with_one_sym?
   end
+
+  def console
+    puts "NFA"
+    super
+  end
+
+  private
 
   def complete_grammar_with_new_N
     @rules.each do |nonterm, right_rules|
@@ -67,10 +74,8 @@ class NFA < FSM
     end
   end
 
-  def form_state_sets
-    @H.push(*@grammar.S)
-    @Q.push(*(@grammar.N + [new_N]))
-    @T.push(*@grammar.T)
+  def new_N
+    @new_N ||= generate_nonterm(@grammar.N)
   end
 
   def rules_to_transition_function
@@ -82,6 +87,12 @@ class NFA < FSM
         @F[left_nonterm][right_term] << right_nonterm
       end
     end
+  end
+
+  def form_state_sets
+    @H.push(*@grammar.S)
+    @Q.push(*(@grammar.N + [new_N]))
+    @T.push(*@grammar.T)
   end
 
   def form_final_states
@@ -103,18 +114,6 @@ class NFA < FSM
     end
   end
 
-  def deterministic?
-    !has_void_chain_transitions? && !has_state_transitions_with_one_sym?
-  end
-
-  def console
-    puts "NFA"
-    super
-  end
-
-
-  private
-
 end
 
 
@@ -132,11 +131,50 @@ class DFA < FSM
     @H = Marshal.load(Marshal.dump(@nfa.H))
     @states_map = {}
     @iter = 0
-    @states_map[@H] = generate_nonterm_in(@Q) if @H.length > 1
+    extend_states(@H)
 
     build_transition_functions(@H)
     form_final_states
     replace_state_sets_with_nonterms
+  end
+
+  def console
+    puts "DFA"
+    super
+    puts "states map: #{@states_map}"
+  end
+
+  private
+
+  def extend_states(transition_set)
+    if @states_map[transition_set].nil? && transition_set.length > 1
+      @states_map[transition_set] = generate_nonterm_in(@Q)
+    end
+  end
+
+  def build_transition_functions(col_set)
+    @T.each do |term|
+      transition_set = []
+      col_set.each do |state|
+        transition_set.push(*@nfa.F[state][term])
+      end
+      # return if transition_set.empty?
+
+      transition_set.uniq!
+      col_nonterm = col_set.length > 1 ? @states_map[col_set] : col_set[0]
+
+      return unless @F[col_nonterm][term].nil?
+
+      @F[col_nonterm][term] = transition_set
+      extend_states(transition_set)
+
+
+      puts("ITER: #{@iter}")
+      puts(@F)
+      puts(@states_map)
+      @iter += 1
+      build_transition_functions(transition_set) unless transition_set.empty?
+    end
   end
 
   def form_final_states
@@ -156,44 +194,6 @@ class DFA < FSM
         end
       end
     end
-  end
-
-  def extend_states(transition_set)
-    if @states_map[transition_set].nil? && transition_set.length > 1
-      @states_map[transition_set] = generate_nonterm_in(@Q)
-    end
-  end
-
-  def build_transition_functions(col_set)
-    @T.each do |term|
-      transition_set = []
-      col_set.each do |state|
-        transition_set.push(*@nfa.F[state][term])
-      end
-
-      return if transition_set.empty?
-
-      transition_set.uniq!
-      col_nonterm = col_set.length > 1 ? @states_map[col_set] : col_set[0]
-
-      return unless @F[col_nonterm][term].nil?
-
-      @F[col_nonterm][term] = transition_set
-      extend_states(transition_set)
-
-
-      puts("ITER: #{@iter}")
-      puts(@F)
-      puts(@states_map)
-      @iter += 1
-      build_transition_functions(transition_set)
-    end
-  end
-
-  def console
-    puts "DFA"
-    super
-    puts "states map: #{@states_map}"
   end
 
 end
