@@ -8,9 +8,12 @@ class GraphDrawer
 
   def output(filename)
     @graph = GraphViz::new( "G", "path" => ARGV[0] )
-    @graph.node["shape"] = "circle"
 
-    @fsm.Q.each { |state| @graph.add_nodes(state) }
+    @graph.node["shape"] = "circle"
+    (@fsm.Q - @fsm.Z).each { |state| @graph.add_nodes(state) }
+
+    @graph.node["shape"] = "doublecircle"
+    @fsm.Z.each { |state| @graph.add_nodes(state) }
 
     @fsm.F.keys.each do |col_nonterm|
       @fsm.F[col_nonterm].keys.each do |term|

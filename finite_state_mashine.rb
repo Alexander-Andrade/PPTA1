@@ -23,6 +23,19 @@ class FSM
     @graph_drawer = GraphDrawer.new(self)
   end
 
+  def console
+    puts "Q:"
+    puts @Q
+    puts "T:"
+    puts @T
+    puts "F: "
+    puts @F
+    puts "H:"
+    puts @H
+    puts "Z:"
+    p @Z
+  end
+
 end
 
 class NFA < FSM
@@ -99,6 +112,12 @@ class NFA < FSM
     !has_void_chain_transitions? && !has_state_transitions_with_one_sym?
   end
 
+  def console
+    puts "NFA"
+    super
+  end
+
+
   private
 
 end
@@ -174,6 +193,13 @@ class DFA < FSM
       @iter += 1
       build_transition_functions(transition_set)
     end
+  end
+
+  def console
+    puts "NFA"
+    super
+    puts "states map:"
+    p @states_map
   end
 
 end

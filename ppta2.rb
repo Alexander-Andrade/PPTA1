@@ -15,18 +15,14 @@ begin
                         })
 
   nfa = NFA.new(grammar)
-  p nfa.F
-  p nfa.Z
-  puts;puts;
+  nfa.output("nfa")
+  nfa.console
+
+  2.times { puts }
 
   dfa = DFA.new(nfa)
-  p dfa.Q
-  puts;
-  p dfa.states_map
-  puts;
-  p dfa.F
-  p dfa.Z
-  dfa.output("graph")
+  dfa.output("dfa")
+  dfa.console
 
 rescue => e
   puts e
