@@ -26,6 +26,8 @@ begin
   puts;
   p dfa.F
   p dfa.Z
+  dfa.output("graph")
+
 rescue => e
   puts e
   exit

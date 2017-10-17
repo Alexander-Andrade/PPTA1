@@ -1,13 +1,16 @@
 require_relative 'grammar_mixin'
+require_relative 'graph_drawer'
 
 class FSM
   include GrammarMixin
+  extend Forwardable
   # Q - states set
   # T - input symbols set
   # F - transition func QxT
   # H - initial states set
   # Z - finish states set
 
+  def_delegators :@graph_drawer, :output
   attr_accessor :rules, :Q, :T, :F, :H, :Z
 
   def initialize
@@ -16,6 +19,8 @@ class FSM
     @F = Hash.new { |hash, key|  hash[key] = Hash.new }
     @H = []
     @Z = []
+
+    @graph_drawer = GraphDrawer.new(self)
   end
 
 end
