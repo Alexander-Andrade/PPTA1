@@ -78,7 +78,7 @@ class NFA < FSM
       right_rules.each do |right_rule|
         right_term = right_rule[0]
         right_nonterm = right_rule[1]
-        @F[left_nonterm][right_term] = [] if @F[left_nonterm][right_term].nil?
+        @F[left_nonterm][right_term] ||= []
         @F[left_nonterm][right_term] << right_nonterm
       end
     end

@@ -15,6 +15,7 @@ begin
                         })
 
   nfa = NFA.new(grammar)
+  puts "is deterministic? #{nfa.deterministic?}"
   nfa.output("nfa")
   nfa.console
 
