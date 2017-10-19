@@ -35,14 +35,17 @@ class FSM
 
   def state_transition_function_from_csv
     state_transition = CSV.read('state_transition_function.csv',
-                                headers:true, col_sep: ' ')
+                                headers:true, col_sep: ' ', skip_blanks: true)
 
     @Q = Marshal.load(Marshal.dump(state_transition.headers))[1..-1]
     @T = Marshal.load(Marshal.dump(state_transition['F']))
 
     @Q.each do |nonterm|
       @T.each_with_index do |term, i|
-        @F[nonterm][term] = state_transition[nonterm][i]
+        value =state_transition[nonterm][i]
+        unless value == 'ø'
+          @F[nonterm][term] = value
+        end
       end
     end
   end
