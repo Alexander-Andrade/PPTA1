@@ -31,6 +31,24 @@ class FSM
     puts "Z: #{@Z}"
   end
 
+  def eliminate_unreachable_states
+    @reachable_states = [@H]
+    traverse_states(@H)
+    unreachable = @Q - @reachable_states
+    @Q = @Q & @reachable_states
+    @Z = @Z & @reachable_states
+    unreachable.each { |state| @F.delete(state) }
+  end
+
+  def traverse_states(state)
+    @F[state].each do |term, new_state|
+      unless @reachable_states.include? new_state
+        @reachable_states.push(new_state)
+        traverse_states(new_state)
+      end
+    end
+  end
+
   private
 
   def state_transition_function_from_csv
