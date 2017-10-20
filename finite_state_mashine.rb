@@ -23,6 +23,10 @@ class FSM
     @graph_drawer = GraphDrawer.new(self)
   end
 
+  def minimize
+
+  end
+
   def console
     puts "Q: #{@Q}"
     puts "T: #{@T}"
@@ -40,6 +44,26 @@ class FSM
     unreachable.each { |state| @F.delete(state) }
   end
 
+  def merge_equivalent_states
+    @R = []
+    @R[0] = []
+    @R[0].push(*@Z)
+    @R[0].push(*(@Q - @Z))
+    n = 1
+    @R[n] = []
+
+    while @R[n] != @R[n-1] do
+      buid_partition_matrix(@R[n-1])
+      n += 1
+    end
+  end
+
+  private
+
+  def buid_partition_matrix(prev_R)
+    partition_matrix = Hash.new { |hash, key| hash[key] = Hash.new }
+  end
+
   def traverse_states(state)
     @F[state].each do |term, new_state|
       unless @reachable_states.include? new_state
@@ -48,8 +72,6 @@ class FSM
       end
     end
   end
-
-  private
 
   def state_transition_function_from_csv
     state_transition = CSV.read('state_transition_function.csv',
