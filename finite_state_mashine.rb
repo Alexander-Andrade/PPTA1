@@ -47,21 +47,36 @@ class FSM
   def merge_equivalent_states
     @R = []
     @R[0] = []
-    @R[0].push(*@Z)
-    @R[0].push(*(@Q - @Z))
+    @R[0].push(@Z)
+    @R[0].push((@Q - @Z))
     n = 1
     @R[n] = []
 
     while @R[n] != @R[n-1] do
-      buid_partition_matrix(@R[n-1])
+      partition_matrix = buid_partition_matrix(@R[n-1])
+      @R[n] = build_new_partition(partition_matrix)
       n += 1
     end
   end
 
   private
 
-  def buid_partition_matrix(prev_R)
+  def equivalence_class(partition, state)
+    partition.find_index { |set| set.include? state }
+  end
+
+  def buid_partition_matrix(partition)
     partition_matrix = Hash.new { |hash, key| hash[key] = Hash.new }
+    @F.each do |nonterm|
+      @F[nonterm].each do |term|
+        partition_matrix[nonterm][term] = equivalence_class(partition, @F[nonterm][term])
+      end
+    end
+
+  end
+
+  def build_new_partition(partition_matrix)
+    grouped = partition_matrix.keys.group_by{ |nonterm| partition_matrix[nonterm] }
   end
 
   def traverse_states(state)

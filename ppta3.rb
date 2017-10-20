@@ -14,6 +14,7 @@ begin
   2.times{ puts; }
 
   fsm.eliminate_unreachable_states
+  fsm.merge_equivalent_states
   fsm.console
 rescue => e
   puts e
