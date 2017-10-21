@@ -54,16 +54,19 @@ class FSM
 
   def replace_equiv_states_in_sets
     equiv_states = @group_states_map.keys.flatten
-    new_states = @group_states_map.values
-    @Q -= equiv_states
-    @Z -= equiv_states
-    @Z += new_states
 
+    @Q -= equiv_states
+    @Z.map! do |state|
+      equiv_states.include?(state) ? nonterm_for_group(state) : state
+    end.uniq!
 
     @F.keys.each do |nonterm|
+      @F[nonterm].keys.each do |term|
+        @F[nonterm][term] = nonterm_for_group(@F[nonterm][term]) if equiv_states.include? @F[nonterm][term]
+      end
       if equiv_states.include? nonterm
         new_nonterm = nonterm_for_group(nonterm)
-        @F[]
+        @F[new_nonterm].empty? ? @F[new_nonterm] = @F.delete(nonterm) : @F.delete(nonterm)
       end
     end
   end
