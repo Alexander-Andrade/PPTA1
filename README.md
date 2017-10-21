@@ -9,4 +9,4 @@ classification:
 {:class=>1, :name=>"context-sensitive grammar"}
 {:class=>2, :name=>"context-free grammar"}
 ```
-You can play grammar.txt around to test programm output
+You can play with `grammar.txt` around to test programm output.
