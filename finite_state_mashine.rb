@@ -52,11 +52,12 @@ class FSM
     n = 1
     @R[n] = []
 
-    while @R[n] != @R[n-1] do
+    while true do
       partition_matrix = buid_partition_matrix(@R[n-1])
-      puts partition_matrix
-      puts @F
       @R[n] = build_new_partition(partition_matrix)
+
+      return if @R[n-1] == @R[n]
+
       n += 1
     end
   end
@@ -70,6 +71,7 @@ class FSM
   def buid_partition_matrix(partition)
     partition_matrix = Hash.new { |hash, key| hash[key] = Hash.new }
     @F.keys.each do |nonterm|
+      partition_matrix[nonterm]
       @F[nonterm].keys.each do |term|
         partition_matrix[nonterm][term] = equivalence_class(partition, @F[nonterm][term])
       end
@@ -78,8 +80,8 @@ class FSM
   end
 
   def build_new_partition(partition_matrix)
-    grouped = partition_matrix.keys.group_by{ |nonterm| partition_matrix[nonterm].values }
-    puts '5'
+    grouped = partition_matrix.keys.group_by{ |nonterm| partition_matrix[nonterm] }
+    grouped.values
   end
 
   def traverse_states(state)
