@@ -72,7 +72,7 @@ class Grammar
 end
 
 begin
-  lines = IO.readlines(ARGV[0])
+  lines = IO.readlines("grammar.txt")
 
   grammar = Grammar.new(lines)
   puts(grammar.rules)
