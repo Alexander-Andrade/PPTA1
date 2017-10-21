@@ -7,7 +7,7 @@ class Grammar
   include GrammarMixin
 
   attr_accessor :T, :N, :P, :S ,:grammar_classifier, :rules
-  def_delegators :@grammar_classifier, :regular?, :right_regular?, :classify
+  def_delegators :@grammar_classifier, :context_free?
 
   def initialize(params)
     @T = params[:T]
