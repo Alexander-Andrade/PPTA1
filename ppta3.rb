@@ -1,7 +1,7 @@
 require 'csv'
 require_relative 'finite_state_mashine'
 
-begin
+# begin
   fsm = FSM.new({
                   H: "X",
                   Z: %w(N),
@@ -13,10 +13,10 @@ begin
 
   2.times{ puts; }
 
-  fsm.eliminate_unreachable_states
-  fsm.merge_equivalent_states
+  fsm.minimize
   fsm.console
-rescue => e
-  puts e
-  exit
-end
+  fsm.output("minimized_graph")
+# rescue => e
+#   puts e
+#   exit
+# end

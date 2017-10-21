@@ -9,7 +9,7 @@ class FSM
   # Z - finish states set
 
   def_delegators :@graph_drawer, :output
-  attr_accessor :rules, :Q, :T, :F, :H, :Z
+  attr_accessor :rules, :Q, :T, :F, :H, :Z, :partition, :group_states_map
 
   def initialize(params)
     @state_transition_file = params[:state_transition_file]
@@ -24,7 +24,8 @@ class FSM
   end
 
   def minimize
-
+    eliminate_unreachable_states
+    merge_equivalent_states
   end
 
   def console
@@ -34,6 +35,8 @@ class FSM
     puts "H: #{@H}"
     puts "Z: #{@Z}"
   end
+
+  private
 
   def eliminate_unreachable_states
     @reachable_states = [@H]
@@ -49,8 +52,6 @@ class FSM
     groups_states_map
     replace_equiv_states_in_sets
   end
-
-  private
 
   def replace_equiv_states_in_sets
     equiv_states = @group_states_map.keys.flatten
