@@ -7,7 +7,7 @@ class GraphDrawer
   end
 
   def output(filename)
-    @graph = GraphViz::new( "G", "path" => ARGV[0] )
+    @graph = GraphViz::new( "G" )
 
     @graph.node["shape"] = "circle"
     (@fsm.Q - @fsm.Z).each { |state| @graph.add_nodes(state) }
