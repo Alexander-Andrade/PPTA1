@@ -75,8 +75,11 @@ begin
   lines = IO.readlines("grammar.txt")
 
   grammar = Grammar.new(lines)
-  puts(grammar.rules)
-  puts(grammar.classify)
+
+  puts "rules:"
+  puts grammar.rules
+  puts "classification:"
+  puts grammar.classify
 rescue => e
   puts e
   exit
