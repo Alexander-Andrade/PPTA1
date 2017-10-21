@@ -56,13 +56,26 @@ class FSM
       partition_matrix = buid_partition_matrix(@R[n-1])
       @R[n] = build_new_partition(partition_matrix)
 
-      return if @R[n-1] == @R[n]
+      break if @R[n-1] == @R[n]
 
       n += 1
     end
+
+    groups_states_map = get_groups_states_map(@R[n])
+    puts groups_states_map
   end
 
   private
+
+  def get_groups_states_map(partition)
+    group_states_map = {}
+    partition.each do |group|
+      if group.length > 1
+        group_states_map[group] = generate_nonterm_in(@Q)
+      end
+    end
+    group_states_map
+  end
 
   def equivalence_class(partition, state)
     partition.find_index { |set| set.include? state }
@@ -108,6 +121,16 @@ class FSM
         end
       end
     end
+  end
+
+  def generate_nonterm(set)
+    (('A'..'Z').to_a - set)[0]
+  end
+
+  def generate_nonterm_in(set)
+    nonterm = generate_nonterm(set)
+    set << nonterm
+    nonterm
   end
 
 end
