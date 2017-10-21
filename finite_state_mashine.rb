@@ -135,7 +135,7 @@ class DFA < FSM
 
     build_transition_functions(@H)
     form_final_states
-    replace_state_sets_with_nonterms
+    replace_state_sets_with_nonterms_and_remove_blank_rules
   end
 
   def console
@@ -183,15 +183,16 @@ class DFA < FSM
     @Z.push(*@nfa.Z)
   end
 
-  def replace_state_sets_with_nonterms
+  def replace_state_sets_with_nonterms_and_remove_blank_rules
     @F.keys.each do |col_nonterm|
       @F[col_nonterm].keys.each do |term|
         if @F[col_nonterm][term].length > 1
           transition_set = @F[col_nonterm][term]
           @F[col_nonterm][term] = @states_map[transition_set]
+        elsif @F[col_nonterm][term].empty?
+          @F[col_nonterm].delete(term)
         end
       end
     end
   end
-
 end
