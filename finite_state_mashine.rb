@@ -45,36 +45,61 @@ class FSM
   end
 
   def merge_equivalent_states
-    @R = []
-    @R[0] = []
-    @R[0].push(@Z)
-    @R[0].push((@Q - @Z))
-    n = 1
-    @R[n] = []
-
-    while true do
-      partition_matrix = buid_partition_matrix(@R[n-1])
-      @R[n] = build_new_partition(partition_matrix)
-
-      break if @R[n-1] == @R[n]
-
-      n += 1
-    end
-
-    groups_states_map = get_groups_states_map(@R[n])
-    puts groups_states_map
+    @partition = final_partition
+    groups_states_map
+    replace_equiv_states_in_sets
   end
 
   private
 
-  def get_groups_states_map(partition)
-    group_states_map = {}
-    partition.each do |group|
-      if group.length > 1
-        group_states_map[group] = generate_nonterm_in(@Q)
+  def replace_equiv_states_in_sets
+    equiv_states = @group_states_map.keys.flatten
+    new_states = @group_states_map.values
+    @Q -= equiv_states
+    @Z -= equiv_states
+    @Z += new_states
+
+
+    @F.keys.each do |nonterm|
+      if equiv_states.include? nonterm
+        new_nonterm = nonterm_for_group(nonterm)
+        @F[]
       end
     end
-    group_states_map
+  end
+
+  def final_partition
+    _R = []
+    _R[0] = []
+    _R[0].push(@Z)
+    _R[0].push((@Q - @Z))
+    n = 1
+    _R[n] = []
+
+    while true do
+      partition_matrix = buid_partition_matrix(_R[n-1])
+      _R[n] = build_new_partition(partition_matrix)
+
+      break if _R[n-1] == _R[n]
+
+      n += 1
+    end
+    _R[n]
+  end
+
+  def groups_states_map
+    @group_states_map = {}
+    @partition.each do |group|
+      if group.length > 1
+        @group_states_map[group] = generate_nonterm_in(@Q)
+      end
+    end
+    @group_states_map
+  end
+
+  def nonterm_for_group(nonterm)
+    group  = @group_states_map.keys.find { |group| group.include? nonterm }
+    !group.nil? ? @group_states_map[group] : nil
   end
 
   def equivalence_class(partition, state)
