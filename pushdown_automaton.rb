@@ -1,4 +1,4 @@
-class StackMemoryMachine
+class PushdownAutomaton
   # M = (Q, T, N, F, q0, N0, Z)
 
   attr_accessor :Q, :q0, :Z, :N, :T, :N0, :F
@@ -15,10 +15,17 @@ class StackMemoryMachine
     @N0 = @grammar.S
 
     @F = {}
-    @stack = [@N0]
-    @head = 0
+
+
     @q = @q0
     form_store_functions
+    load_init_configuration
+  end
+
+  def load_init_configuration
+    @head = 0
+    @stack = [@N0]
+    @str = ''
   end
 
   def form_store_functions
@@ -37,13 +44,12 @@ class StackMemoryMachine
   end
 
   def recognize(str)
+    @str = str
+  end
 
+  def configuration
+    [@q, @str[@head..-1], @stack]
   end
 
   private
-
-  def configuration(str)
-    [@q, str[@head..-1], @stack]
-  end
-
 end
