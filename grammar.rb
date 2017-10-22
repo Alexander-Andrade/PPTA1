@@ -10,10 +10,10 @@ class Grammar
   def_delegators :@grammar_classifier, :context_free?
 
   def initialize(params)
-    @T = params[:T]
-    @N = params[:N]
-    @P = params[:P]
-    @S = params[:S]
+    @T = Marshal.load(Marshal.dump(params["T"]))
+    @N = Marshal.load(Marshal.dump(params["N"]))
+    @P = Marshal.load(Marshal.dump(params["P"]))
+    @S = Marshal.load(Marshal.dump(params["S"]))
 
     trim_spaces_in_rules
     raise StandardError, "Grammar contains errors" unless valid?
