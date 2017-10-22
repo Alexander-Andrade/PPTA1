@@ -1,5 +1,0 @@
-Q→acA|acB|ε
-B→A|Cb|ε
-A→Aa|Ab|a
-C→dCc
-D→dc
