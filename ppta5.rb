@@ -9,4 +9,4 @@ grammar_definition = JSON.load File.new("grammar.json")
 grammar = Grammar.new(grammar_definition)
 pushdown_automaton = PushdownAutomaton.new(grammar)
 puts pushdown_automaton.F
-p pushdown_automaton.configuration
+pushdown_automaton.recognize 'acab'

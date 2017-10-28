@@ -1,4 +1,7 @@
+require_relative 'grammar_mixin'
+
 class PushdownAutomaton
+  include GrammarMixin
   # M = (Q, T, N, F, q0, N0, Z)
 
   attr_accessor :Q, :q0, :Z, :N, :T, :N0, :F
@@ -47,9 +50,53 @@ class PushdownAutomaton
     @str = str
   end
 
-  def configuration
-    [@q, @str[@head..-1], @stack]
+  private
+
+  def string_remainder
+    @str[@head..-1]
   end
 
-  private
+  def configuration
+    [@q, string_remainder, @stack.dup]
+  end
+
+  def nonterm_on_top?
+    /^#{GrammarMixin::N}$/ === @stack.last
+  end
+
+  def rule_term_chain(rule)
+    GrammarMixin::T.match(rule)
+  end
+
+  def rules_with_nonterms(rules)
+    rules.select { |rule| /^#{GrammarMixin::T}+#{GrammarMixin::N}+/ === rule }
+  end
+
+  def possible_rules(rules)
+    str_remainder = string_remainder
+    rules_with_nonterms(rules).select { |rule| str_remainder.start_with? rule_term_chain(rule) }
+    rules_with_nonterms.sort_by(&:length)
+  end
+
+  def choose_rule
+    str_remainder = string_remainder
+    rules = @F[@stack.last]
+
+    exact_term_rule = rules.find { |rule| rule == str_remainder }
+    return exact_term_rule unless exact_term_rule.nil?
+
+    rules_pretenders = possible_rules(rules)
+
+  end
+
+  def replace_nonterm_with_rule
+
+  end
+
+  def recognition_step
+    if nonterm_on_top?
+
+    end
+  end
+
 end
