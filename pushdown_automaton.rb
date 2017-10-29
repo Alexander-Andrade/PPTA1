@@ -68,6 +68,10 @@ class PushdownAutomaton
     end
   end
 
+  def rules_applied
+    @rules_applied.map { |rule| {rule[:left] => rule[:right] } }
+  end
+
   private
 
   def string_remainder
@@ -174,12 +178,18 @@ class PushdownAutomaton
   end
 
   def recognition_step
+    print_configuration
     if nonterm_on_top?
       replace_nonterm_with_rule
     elsif term_on_top?
       process_term_on_top
     end
-    puts configuration
+  end
+
+  def print_configuration
+    config = configuration
+    stack = @stack.map { |el| el[:sym] }
+    puts "state: #{config[0].to_s.ljust(10)} remainder: #{config[1].ljust(30)} st: #{stack}"
   end
 
 end

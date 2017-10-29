@@ -8,5 +8,7 @@ require_relative 'pushdown_automaton'
 grammar_definition = JSON.load File.new("grammar.json")
 grammar = Grammar.new(grammar_definition)
 pushdown_automaton = PushdownAutomaton.new(grammar)
-puts pushdown_automaton.F
-puts "is the string is accepted? #{pushdown_automaton.recognize('acaab')}"
+
+accepted = pushdown_automaton.recognize('acab')
+puts "is the string is accepted? #{accepted}"
+puts "rules applied: #{pushdown_automaton.rules_applied}"
