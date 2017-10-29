@@ -17,7 +17,7 @@ state: q          remainder: ab                             st: ["X", "a"]
 state: q          remainder: b                              st: ["X"]
 state: q          remainder: b                              st: ["X", "b"]
 state: q          remainder:                                st: ["X"]
-accepted string: true
+Is string accepted? : true
 rules applied: [{"C"=>"acA"}, {"A"=>"aX"}, {"X"=>"bX"}, {"X"=>"ε"}]
 
 
@@ -32,5 +32,5 @@ state: q          remainder: acb                            st: ["X", "a"]
 state: q          remainder: cb                             st: ["X"]
 state: q          remainder: acb                            st: ["A"]
 all rules are unsuitable
-not accepted string: false
+Is string accepted? : false
 ```

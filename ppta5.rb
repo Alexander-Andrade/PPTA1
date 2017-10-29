@@ -10,10 +10,10 @@ grammar = Grammar.new(grammar_definition)
 pushdown_automaton = PushdownAutomaton.new(grammar)
 
 accepted = pushdown_automaton.recognize('acab')
-puts "accepted string: #{accepted}"
+puts "Is string accepted? : #{accepted}"
 puts "rules applied: #{pushdown_automaton.rules_applied}"
 
 2.times {puts;}
 
 not_accepted = pushdown_automaton.recognize('acacb')
-puts "not accepted string: #{not_accepted}"
+puts "Is string accepted? : #{not_accepted}"
