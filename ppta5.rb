@@ -9,4 +9,4 @@ grammar_definition = JSON.load File.new("grammar.json")
 grammar = Grammar.new(grammar_definition)
 pushdown_automaton = PushdownAutomaton.new(grammar)
 puts pushdown_automaton.F
-puts "is the string is accepted? #{pushdown_automaton.recognize('aca')}"
+puts "is the string is accepted? #{pushdown_automaton.recognize('acaab')}"

@@ -153,7 +153,7 @@ class PushdownAutomaton
       save_applied_rule(selected_rule)
       remember_config
       @stack.pop
-      put_rule_on_top(selected_rule)
+      put_rule_on_top(selected_rule) if selected_rule != 'ε'
     end
   end
 
