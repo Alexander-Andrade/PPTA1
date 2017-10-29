@@ -56,16 +56,15 @@ class PushdownAutomaton
 
     begin
       while true
-        if string_remainder.empty? && @stack.empty?
+        if string_remainder.empty? && stack_empty_or_contains_only_epsilon?
           return true
-        elsif string_remainder.empty?
-          return false
         else
           recognition_step
         end
       end
     rescue => e
       puts e.to_s
+      return false
     end
   end
 
@@ -79,6 +78,10 @@ class PushdownAutomaton
     @str[@head]
   end
 
+  def stack_empty_or_contains_only_epsilon?
+    (@stack.length == 1 && @stack.first[:sym] == 'ε') || @stack.empty?
+  end
+
   def configuration
     [@q, string_remainder, @stack.dup]
   end
@@ -88,7 +91,7 @@ class PushdownAutomaton
   end
 
   def load_prev_config
-    @head = @str.index(@configurations.last[1])
+    @head = @str.rindex(@configurations.last[1])
     @stack = @configurations.last[2]
     @configurations.pop
   end
@@ -135,6 +138,7 @@ class PushdownAutomaton
       selected = chose_another_rule
     else
       selected = rules.find { |rule| rule == str_remainder }
+      selected = 'ε' if str_remainder.empty? && rules.include?('ε')
       selected = sorted_possible_rules(rules)[0] if selected.nil?
     end
     selected
@@ -156,8 +160,8 @@ class PushdownAutomaton
   def chose_another_rule
     unsuitable_rule = @rules_applied.pop
     possible_rules = sorted_possible_rules(rules_for(@stack.last[:sym]))
-    ind = possible_rules.index(unsuitable_rule) + 1
-    if ind > possible_rules.length
+    ind = possible_rules.index(unsuitable_rule[:right]) + 1
+    if ind >= possible_rules.length
       raise StandardError, 'all rules are unsuitable'
     end
     possible_rules[ind]
