@@ -26,11 +26,14 @@ class PushdownAutomaton
   end
 
   def load_init_configuration
+    @cur_stack_id = 0
     @head = 0
-    @stack = [@N0]
+    @stack = []
     @str = ''
     @rules_applied = []
     @configurations = []
+
+    put_rule_on_top(@N0)
   end
 
   def form_store_functions
@@ -50,6 +53,20 @@ class PushdownAutomaton
 
   def recognize(str)
     @str = str
+
+    begin
+      while true
+        if string_remainder.empty? && @stack.empty?
+          return true
+        elsif string_remainder.empty?
+          return false
+        else
+          recognition_step
+        end
+      end
+    rescue => e
+      puts e.to_s
+    end
   end
 
   private
@@ -70,24 +87,22 @@ class PushdownAutomaton
     @configurations.push(configuration)
   end
 
-  def goto_prev_config
+  def load_prev_config
     @head = @str.index(@configurations.last[1])
     @stack = @configurations.last[2]
     @configurations.pop
-
-    @rules_applied.pop
   end
 
   def nonterm_on_top?
-    /^#{GrammarMixin::N}$/ === @stack.last
+    /^#{GrammarMixin::N}$/ === @stack.last[:sym]
   end
 
   def term_on_top?
-    /^#{GrammarMixin::T}$/ === @stack.last
+    /^#{GrammarMixin::T}$/ === @stack.last[:sym]
   end
 
   def rule_term_chain(rule)
-    GrammarMixin::T.match(rule)
+    GrammarMixin::T.match(rule).to_a.first
   end
 
   def sorted_possible_rules(rules)
@@ -98,27 +113,63 @@ class PushdownAutomaton
   end
 
   def put_rule_on_top(rule)
-    @stack.push(*rule.reverse.chars)
+    rule.chars.reverse_each do |sym|
+      @stack.push({ id: @cur_stack_id, sym: sym })
+      @cur_stack_id += 1
+    end
+  end
+
+  def rules_for nonterm
+    @grammar.rules[nonterm]
+  end
+
+  def save_applied_rule(rule)
+    @rules_applied.push({ id: @stack.last[:id], left: @stack.last[:sym], right: rule })
+  end
+
+  def select_rule
+    str_remainder = string_remainder
+    rules = rules_for @stack.last[:sym]
+
+    if (!@rules_applied.last.nil?) && (@rules_applied.last[:id] == @stack.last[:id])
+      selected = chose_another_rule
+    else
+      selected = rules.find { |rule| rule == str_remainder }
+      selected = sorted_possible_rules(rules)[0] if selected.nil?
+    end
+    selected
   end
 
   def replace_nonterm_with_rule
-    str_remainder = string_remainder
-    rules = @F[@stack.last]
+    selected_rule = select_rule
 
-    selected_rule = rules.find { |rule| rule == str_remainder }
-    selected_rule = sorted_possible_rules(rules)[0] if selected_rule.nil?
-    @rules_applied.push({ @stack.last => selected_rule })
+    if selected_rule.nil?
+      load_prev_config
+    else
+      save_applied_rule(selected_rule)
+      remember_config
+      @stack.pop
+      put_rule_on_top(selected_rule)
+    end
+  end
 
-    @stack.pop
-    put_rule_on_top(selected_rule)
+  def chose_another_rule
+    unsuitable_rule = @rules_applied.pop
+    possible_rules = sorted_possible_rules(rules_for(@stack.last[:sym]))
+    ind = possible_rules.index(unsuitable_rule) + 1
+    if ind > possible_rules.length
+      raise StandardError, 'all rules are unsuitable'
+    end
+    possible_rules[ind]
   end
 
   def process_term_on_top
-    if input_char == @stack.last
+    if input_char == @stack.last[:sym]
       @stack.pop
       @head += 1
     else
-
+      load_prev_config
+      chose_another_rule
     end
   end
 
@@ -128,6 +179,7 @@ class PushdownAutomaton
     elsif term_on_top?
       process_term_on_top
     end
+    puts configuration
   end
 
 end
