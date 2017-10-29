@@ -1,6 +1,5 @@
-Do `gem install ruby-graphviz` or `bundle` if bundle is already installed. 
-To run execute `ruby ppta2.rb`
-Results - `dfa.png`, `nfa.png` + state machine sets console output
+To run execute `ruby ppta5.rb`
+
 Console output for var 4 (example):
 
 ```

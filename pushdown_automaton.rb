@@ -22,14 +22,13 @@ class PushdownAutomaton
 
     @q = @q0
     form_store_functions
-    load_init_configuration
   end
 
-  def load_init_configuration
+  def load_init_configuration(str)
     @cur_stack_id = 0
     @head = 0
     @stack = []
-    @str = ''
+    @str = str
     @rules_applied = []
     @configurations = []
 
@@ -52,7 +51,7 @@ class PushdownAutomaton
   end
 
   def recognize(str)
-    @str = str
+    load_init_configuration(str)
 
     begin
       while true
