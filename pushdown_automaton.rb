@@ -1,6 +1,6 @@
 require_relative 'grammar_mixin'
 
-class PushdownAutomaton
+class AbstractAutomaton
   include GrammarMixin
   # M = (Q, T, N, F, q0, N0, Z)
 
@@ -9,6 +9,22 @@ class PushdownAutomaton
   def initialize(grammar)
     @grammar = grammar
     raise StandardError, 'grammar is not a context free one' unless grammar.context_free?
+
+    @q0 = 'q'
+    @N = @grammar.T + @grammar.N
+    @T = @grammar.T
+
+    @F = {}
+
+    @q = @q0
+  end
+
+end
+
+class PushdownAutomaton < AbstractAutomaton
+
+  def initialize(grammar)
+    super(grammar)
 
     @Q = ['q']
     @q0 = 'q'
@@ -116,7 +132,7 @@ class PushdownAutomaton
 
   def put_rule_on_top(rule)
     rule.chars.reverse_each do |sym|
-      @stack.push({ id: @cur_stack_id, sym: sym })
+      @stack.push(id: @cur_stack_id, sym: sym)
       @cur_stack_id += 1
     end
   end
@@ -126,7 +142,7 @@ class PushdownAutomaton
   end
 
   def save_applied_rule(rule)
-    @rules_applied.push({ id: @stack.last[:id], left: @stack.last[:sym], right: rule })
+    @rules_applied.push(id: @stack.last[:id], left: @stack.last[:sym], right: rule)
   end
 
   def select_rule
@@ -189,6 +205,18 @@ class PushdownAutomaton
     config = configuration
     stack = @stack.map { |el| el[:sym] }
     puts "state: #{config[0].to_s.ljust(10)} remainder: #{config[1].ljust(30)} st: #{stack}"
+  end
+
+end
+
+
+class ExtendedPushdownAutomaton < AbstractAutomaton
+
+  def initialize(grammar)
+    super(grammar)
+
+    @Q = %w(q r)
+
   end
 
 end
