@@ -56,7 +56,7 @@ class PushdownAutomaton
 
     begin
       while true
-        if string_remainder.empty? && stack_empty_or_contains_only_epsilon?
+        if string_remainder.empty? && @stack.empty?
           return true
         else
           recognition_step
@@ -76,10 +76,6 @@ class PushdownAutomaton
 
   def input_char
     @str[@head]
-  end
-
-  def stack_empty_or_contains_only_epsilon?
-    (@stack.length == 1 && @stack.first[:sym] == 'ε') || @stack.empty?
   end
 
   def configuration
