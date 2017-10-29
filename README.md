@@ -1,21 +1,36 @@
 To run execute `ruby ppta5.rb`
+grammar definition in `grammar.json`
+accepted string 'acab'
+not accepted string 'acacb'
 
 Console output for var 4 (example):
 
 ```
-NFA
-Q: ["X", "Y", "Z", "W", "V", "A"]
-T: ["0", "1", "~", "#", "&"]
-F: {"X"=>{"0"=>["Y"], "1"=>["Z"], "ε"=>["A"]}, "Y"=>{"0"=>["Z"], "~"=>["W"], "#"=>["A"]}, "Z"=>{"1"=>["Y", "W"], "0"=>["V"]}, "W"=>{"0"=>["W"], "1"=>["W"], "#"=>["A"]}, "V"=>{"&"=>["Z"]}}
-H: ["X"]
-Z: ["A", "X"]
+state: q          remainder: acab                           st: ["C"]
+state: q          remainder: acab                           st: ["A", "c", "a"]
+state: q          remainder: cab                            st: ["A", "c"]
+state: q          remainder: ab                             st: ["A"]
+state: q          remainder: ab                             st: ["X", "A", "a"]
+state: q          remainder: b                              st: ["X", "A"]
+state: q          remainder: ab                             st: ["A"]
+state: q          remainder: ab                             st: ["X", "a"]
+state: q          remainder: b                              st: ["X"]
+state: q          remainder: b                              st: ["X", "b"]
+state: q          remainder:                                st: ["X"]
+accepted string: true
+rules applied: [{"C"=>"acA"}, {"A"=>"aX"}, {"X"=>"bX"}, {"X"=>"ε"}]
 
 
-DFA
-Q: ["X", "Y", "Z", "W", "V", "A", "B", "C", "D"]
-T: ["0", "1", "~", "#", "&", "ε"]
-F: {"X"=>{"0"=>["Y"], "1"=>["Z"], "ε"=>["A"]}, "Y"=>{"0"=>["Z"], "~"=>["W"], "#"=>["A"]}, "Z"=>{"0"=>["V"], "1"=>"B"}, "V"=>{"&"=>["Z"]}, "B"=>{"0"=>"C", "1"=>["W"], "~"=>["W"], "#"=>["A"]}, "C"=>{"0"=>"D", "1"=>"B", "#"=>["A"]}, "D"=>{"0"=>["W"], "1"=>["W"], "#"=>["A"], "&"=>["Z"]}, "W"=>{"0"=>["W"], "1"=>["W"], "#"=>["A"]}, "A"=>{}}
-H: ["X"]
-Z: ["A", "X"]
-states map: {["Y", "W"]=>"B", ["Z", "W"]=>"C", ["V", "W"]=>"D"}
+state: q          remainder: acacb                          st: ["C"]
+state: q          remainder: acacb                          st: ["A", "c", "a"]
+state: q          remainder: cacb                           st: ["A", "c"]
+state: q          remainder: acb                            st: ["A"]
+state: q          remainder: acb                            st: ["X", "A", "a"]
+state: q          remainder: cb                             st: ["X", "A"]
+state: q          remainder: acb                            st: ["A"]
+state: q          remainder: acb                            st: ["X", "a"]
+state: q          remainder: cb                             st: ["X"]
+state: q          remainder: acb                            st: ["A"]
+all rules are unsuitable
+not accepted string: false
 ```
