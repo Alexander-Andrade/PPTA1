@@ -74,7 +74,8 @@ class PushdownAutomaton < AbstractPushdownAutomaton
         end
       end
     rescue => e
-      puts e.to_s
+      puts e
+      puts "rules applied: #{rules_applied}"
       return false
     end
   end
@@ -197,7 +198,8 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
         end
       end
     rescue => e
-      puts e.to_s
+      puts e
+      puts "rules applied: #{rules_applied}"
       return false
     end
   end
@@ -209,7 +211,7 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
   private
 
   def str_is_over?
-    @head == -1
+    @head <= -1
   end
 
   def stack_contains_axiom_only?
@@ -228,6 +230,7 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
   def shift
     @stack.push(input_char)
     @head -= 1
+    raise StandardError, "string is over, can't do shift" if @head < -1
   end
 
   def stack_as_str
@@ -257,7 +260,7 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
 
     alternatives = rule_alternatives
 
-    if @head == -1 && alternatives.empty?
+    if str_is_over? && alternatives.empty?
       load_prev_config
       selected_alternative = next_alternative
     end
