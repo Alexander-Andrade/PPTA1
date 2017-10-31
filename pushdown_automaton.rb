@@ -202,6 +202,9 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
     end
   end
 
+  def rules_applied
+    @rules_applied.map { |rule| {rule[:nonterm] => rule[:rule] } }
+  end
 
   private
 
@@ -249,10 +252,6 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
     alternatives[ind]
   end
 
-  def has_last_config_alternative?
-    @configurations.length == @applied_alternatives.length
-  end
-
   def reduce
     return false if @stack.empty?
 
@@ -274,6 +273,8 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
 
     @stack.pop(selected_alternative[:rule].length)
     @stack.push(selected_alternative[:nonterm])
+
+    @rules_applied.push selected_alternative
 
     true
   end

@@ -8,13 +8,4 @@ module GrammarMixin
   LEFT_REGULAR_RULE = /^#{N}#{ARROW}(#{N}#{T}|#{T})(\|(#{N}#{T}|#{T}))*$/
   RIGHT_REGULAR_RULE = /^#{N}#{ARROW}(#{T}#{N}|#{T})(\|(#{T}#{N}|#{T}))*$/
 
-  def generate_nonterm(set)
-    (('A'..'Z').to_a - set)[0]
-  end
-
-  def generate_nonterm_in(set)
-    nonterm = generate_nonterm(set)
-    set << nonterm
-    nonterm
-  end
 end
