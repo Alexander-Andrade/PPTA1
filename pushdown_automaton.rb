@@ -1,6 +1,6 @@
 require_relative 'grammar_mixin'
 
-class AbstractAutomaton
+class AbstractPushdownAutomaton
   include GrammarMixin
   # M = (Q, T, N, F, q0, N0, Z)
 
@@ -8,62 +8,58 @@ class AbstractAutomaton
 
   def initialize(grammar)
     @grammar = grammar
-    raise StandardError, 'grammar is not a context free one' unless grammar.context_free?
+    grammar_check
+  end
 
-    @q0 = 'q'
-    @N = @grammar.T + @grammar.N
-    @T = @grammar.T
+  protected
 
-    @F = {}
+  def grammar_check
+    raise StandardError, 'grammar is not a context free one' unless @grammar.context_free?
+  end
 
-    @q = @q0
+  def input_char
+    @str[@head]
+  end
+
+  def rules_for nonterm
+    @grammar.rules[nonterm]
+  end
+
+  def string_remainder
+    @str[@head..-1]
+  end
+
+  def configuration
+    [string_remainder, @stack.dup]
+  end
+
+  def remember_config
+    @configurations.push(configuration)
+  end
+
+  def load_prev_config
+    @head = @str.rindex(@configurations.last[0])
+    @stack = @configurations.last[1]
+    @configurations.pop
   end
 
 end
 
-class PushdownAutomaton < AbstractAutomaton
+class PushdownAutomaton < AbstractPushdownAutomaton
 
   def initialize(grammar)
     super(grammar)
-
-    @Q = ['q']
-    @q0 = 'q'
-    @Z = []
-    @N = @grammar.T + @grammar.N
-    @T = @grammar.T
-    @N0 = @grammar.S
-
-    @F = {}
-
-
-    @q = @q0
-    form_store_functions
   end
 
   def load_init_configuration(str)
+    @str = str
     @cur_stack_id = 0
     @head = 0
     @stack = []
-    @str = str
     @rules_applied = []
     @configurations = []
 
-    put_rule_on_top(@N0)
-  end
-
-  def form_store_functions
-    @grammar.rules.each do |left_nonterm, right_rules|
-      key = [@q, 'ε', left_nonterm]
-      @F[key] = []
-      right_rules.each do |rule|
-        @F[key].push([@q, rule])
-      end
-    end
-
-    @grammar.T.each do |term|
-      key = [@q, term, term]
-      @F[key] = [@q, 'ε']
-    end
+    put_rule_on_top(@grammar.S)
   end
 
   def recognize(str)
@@ -89,28 +85,6 @@ class PushdownAutomaton < AbstractAutomaton
 
   private
 
-  def string_remainder
-    @str[@head..-1]
-  end
-
-  def input_char
-    @str[@head]
-  end
-
-  def configuration
-    [@q, string_remainder, @stack.dup]
-  end
-
-  def remember_config
-    @configurations.push(configuration)
-  end
-
-  def load_prev_config
-    @head = @str.rindex(@configurations.last[1])
-    @stack = @configurations.last[2]
-    @configurations.pop
-  end
-
   def nonterm_on_top?
     /^#{GrammarMixin::N}$/ === @stack.last[:sym]
   end
@@ -121,6 +95,10 @@ class PushdownAutomaton < AbstractAutomaton
 
   def rule_term_chain(rule)
     GrammarMixin::T.match(rule).to_a.first
+  end
+
+  def save_applied_rule(rule)
+    @rules_applied.push(id: @stack.last[:id], left: @stack.last[:sym], right: rule)
   end
 
   def sorted_possible_rules(rules)
@@ -135,14 +113,6 @@ class PushdownAutomaton < AbstractAutomaton
       @stack.push(id: @cur_stack_id, sym: sym)
       @cur_stack_id += 1
     end
-  end
-
-  def rules_for nonterm
-    @grammar.rules[nonterm]
-  end
-
-  def save_applied_rule(rule)
-    @rules_applied.push(id: @stack.last[:id], left: @stack.last[:sym], right: rule)
   end
 
   def select_rule
@@ -176,9 +146,8 @@ class PushdownAutomaton < AbstractAutomaton
     unsuitable_rule = @rules_applied.pop
     possible_rules = sorted_possible_rules(rules_for(@stack.last[:sym]))
     ind = possible_rules.index(unsuitable_rule[:right]) + 1
-    if ind >= possible_rules.length
-      raise StandardError, 'all rules are unsuitable'
-    end
+    raise StandardError, 'all rules are unsuitable' if ind >= possible_rules.length
+
     possible_rules[ind]
   end
 
@@ -204,19 +173,113 @@ class PushdownAutomaton < AbstractAutomaton
   def print_configuration
     config = configuration
     stack = @stack.map { |el| el[:sym] }
-    puts "state: #{config[0].to_s.ljust(10)} remainder: #{config[1].ljust(30)} st: #{stack}"
+    puts "remainder: #{config[0].ljust(30)} st: #{stack}"
   end
 
 end
 
 
-class ExtendedPushdownAutomaton < AbstractAutomaton
+class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
 
   def initialize(grammar)
     super(grammar)
+  end
 
-    @Q = %w(q r)
+  def recognize(str)
+    load_init_configuration(str)
 
+    begin
+      while true
+        if str_is_over? && stack_contains_axiom_only?
+          return true
+        else
+          recognition_step
+        end
+      end
+    rescue => e
+      puts e.to_s
+      return false
+    end
+  end
+
+
+  private
+
+  def str_is_over?
+    @head == -1
+  end
+
+  def stack_contains_axiom_only?
+    (@stack.length == 1) && @stack.first == @grammar.S
+  end
+
+  def load_init_configuration(str)
+    @str = str
+    @stack = []
+    @rules_applied = []
+    @configurations = []
+    @head = str.length - 1
+    @applied_alternatives = []
+  end
+
+  def shift
+    @stack.push(input_char)
+    @head -= 1
+  end
+
+  def stack_as_str
+    @stack.reverse.join
+  end
+
+  def rule_alternatives
+    stack_str = stack_as_str
+    alternatives = []
+    (1..stack_str.length).reverse_each do |i|
+      stack_substr = stack_str[0...i]
+      suitable_rules = @grammar.rules.select {|left_nonterm, rules| rules.include? stack_substr }
+      alternatives.push(*suitable_rules.map{|left_nonterm, rules| {nonterm: left_nonterm, rule: stack_substr } })
+    end
+    alternatives.uniq{ |a| a[:nonterm] }
+  end
+
+  def next_alternative
+    alternatives = rule_alternatives
+    ind = alternatives.index(@applied_alternatives.pop) + 1
+    raise StandardError, 'there is no alternatives more' if ind >= alternatives.length
+    alternatives[ind]
+  end
+
+  def has_last_config_alternative?
+    @configurations.length == @applied_alternatives.length
+  end
+
+  def reduce
+    return false if @stack.empty?
+
+    alternatives = rule_alternatives
+
+    if @head == -1 && alternatives.empty?
+      load_prev_config
+      selected_alternative = next_alternative
+    end
+
+    return false if alternatives.empty?
+
+    selected_alternative ||= alternatives[0]
+
+    if alternatives.length > 1
+      @applied_alternatives.push(selected_alternative)
+      remember_config
+    end
+
+    @stack.pop(selected_alternative[:rule].length)
+    @stack.push(selected_alternative[:nonterm])
+
+    true
+  end
+
+  def recognition_step
+    shift unless reduce
   end
 
 end

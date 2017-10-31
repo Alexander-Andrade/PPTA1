@@ -17,3 +17,12 @@ puts "rules applied: #{pushdown_automaton.rules_applied}"
 
 not_accepted = pushdown_automaton.recognize('acacb')
 puts "Is string accepted? : #{not_accepted}"
+
+
+
+extended_grammar_definition = JSON.load File.new("extended_grammar.json")
+grammar = Grammar.new(extended_grammar_definition)
+extended_pushdown_automaton = ExtendedPushdownAutomaton.new(grammar)
+
+accepted = extended_pushdown_automaton.recognize('acab')
+puts "Is string accepted? : #{accepted}"
