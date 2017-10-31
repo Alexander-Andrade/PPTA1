@@ -25,22 +25,12 @@ class AbstractPushdownAutomaton
     @grammar.rules[nonterm]
   end
 
-  def string_remainder
-    @str[@head..-1]
-  end
-
   def configuration
     [string_remainder, @stack.dup]
   end
 
   def remember_config
     @configurations.push(configuration)
-  end
-
-  def load_prev_config
-    @head = @str.rindex(@configurations.last[0])
-    @stack = @configurations.last[1]
-    @configurations.pop
   end
 
 end
@@ -100,6 +90,16 @@ class PushdownAutomaton < AbstractPushdownAutomaton
 
   def save_applied_rule(rule)
     @rules_applied.push(id: @stack.last[:id], left: @stack.last[:sym], right: rule)
+  end
+
+  def string_remainder
+    @str[@head..-1]
+  end
+
+  def load_prev_config
+    @head = @str.rindex(@configurations.last[0])
+    @stack = @configurations.last[1]
+    @configurations.pop
   end
 
   def sorted_possible_rules(rules)
@@ -214,6 +214,16 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
     @head <= -1
   end
 
+  def string_remainder
+    @str[0...@head]
+  end
+
+  def load_prev_config
+    @head = @str.index(@configurations.last[0])
+    @stack = @configurations.last[1]
+    @configurations.pop
+  end
+
   def stack_contains_axiom_only?
     (@stack.length == 1) && @stack.first == @grammar.S
   end
@@ -248,8 +258,7 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
     alternatives.uniq{ |a| a[:nonterm] }
   end
 
-  def next_alternative
-    alternatives = rule_alternatives
+  def next_alternative(alternatives)
     ind = alternatives.index(@applied_alternatives.pop) + 1
     raise StandardError, 'there is no alternatives more' if ind >= alternatives.length
     alternatives[ind]
@@ -262,7 +271,8 @@ class ExtendedPushdownAutomaton < AbstractPushdownAutomaton
 
     if str_is_over? && alternatives.empty?
       load_prev_config
-      selected_alternative = next_alternative
+      alternatives = rule_alternatives
+      selected_alternative = next_alternative(alternatives)
     end
 
     return false if alternatives.empty?
