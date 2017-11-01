@@ -1,3 +1,5 @@
+require 'json'
+
 class Grammar
   N = /[A-Z]/
   T = /[a-zλ]/
@@ -72,9 +74,9 @@ class Grammar
 end
 
 begin
-  lines = IO.readlines("grammar.txt")
+  grammar_definition = JSON.load File.new("grammar.json")
 
-  grammar = Grammar.new(lines)
+  grammar = Grammar.new(grammar_definition["P"])
 
   puts "rules:"
   puts grammar.rules
