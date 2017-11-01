@@ -1,11 +1,10 @@
+require 'json'
 require 'csv'
-require_relative 'finite_state_mashine'
+require_relative 'finite_state_machine'
 
-fsm = FSM.new({
-                H: "X",
-                Z: %w(N),
-                state_transition_file: 'state_transition_function.csv'
-              })
+fms_definitions = JSON.load File.new("finite_state_machine.json")
+
+fsm = FSM.new(fms_definitions, 'state_transition_function.csv')
 
 fsm.console
 fsm.output("graph")

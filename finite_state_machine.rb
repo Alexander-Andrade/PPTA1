@@ -11,12 +11,12 @@ class FSM
   def_delegators :@graph_drawer, :output
   attr_accessor :rules, :Q, :T, :F, :H, :Z, :partition, :group_states_map
 
-  def initialize(params)
-    @state_transition_file = params[:state_transition_file]
+  def initialize(fsm_definitions, state_transition_file)
+    @state_transition_file = state_transition_file
 
     @F = Hash.new { |hash, key| hash[key] = Hash.new }
-    @H = params[:H]
-    @Z = params[:Z]
+    @H = fsm_definitions["H"]
+    @Z = fsm_definitions["Z"]
 
     state_transition_function_from_csv
 
